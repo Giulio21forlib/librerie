@@ -12,3 +12,6 @@ COME IMPOSTARE LA LIBRERIA
       . Generale->Templates->CSound e copia il file template e incolallo al posto del tamplate di Deafult
   . Salva le impostazioni ed esci
 
+
+LINK PER IMPARARE A SCRIVERE GLI UDO
+https://flossmanual.csound.com/csound-language/user-defined-opcodes
