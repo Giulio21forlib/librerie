@@ -1,0 +1,26 @@
+#define G_MACRO#
+gkamp init 0
+gkfreq init 0
+#
+
+
+;INVILUPPO ANTI CLIC
+#define ANTI_CLIC(time'ain)#
+kenv cosseg 0,.1,1,$time-0.2,1,.1,0
+aout = $ain *kenv
+#
+
+;VOGLIO UNA TABELLA
+;#define TABELLA(time'fn)#
+;kline line 0,$time,1
+;ktab table kline, $fn,1
+;#
+
+;;;;;;;;;;;
+	opcode Tabella, k,ii
+itime, ifn xin
+kline line 0,itime,1
+ktab table kline,ifn,1
+xout ktab
+	endop
+;;;;;;;;;;;

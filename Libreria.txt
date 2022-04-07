@@ -1,0 +1,99 @@
+sr=48000
+ksmps=3
+0dbfs=1
+nchnls=2
+#include "funzioncine.txt"
+
+
+
+
+;VIBRATO
+	opcode	Vib, a, kk
+kamp,kfreq xin
+aout oscil kamp, kfreq,1
+xout aout
+	endop
+
+
+
+
+
+
+
+
+
+
+;BANCO OSCILLATORI
+	opcode BANCONE_OSC, a, iiiiiii
+;in_osc=[numero di oscil],k(F-A)min=[freq e amp minime],k(F-A)max=[freq e amp massime],iFN=[tabella]
+in_osc,idur,iFmin,iFmax,iAmin,iAmax,iFN xin
+seed 0
+ifn random 100, iFN
+kenv Tabella idur,int(ifn)
+iCounter = 1
+ifreq 	random iFmin,iFmax
+iamp 	random iAmin,iAmax
+ if in_osc>iCounter  then
+acall BANCONE_OSC in_osc-1,idur,iFmin,iFmax,iAmin,iAmax,iFN
+ endif
+aout      poscil    iamp, ifreq, 1
+aout      =         (aout*kenv) + acall
+          xout      aout
+	endop
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;SINTH FM CHOWNING
+;;---iC:iM=N1:N2---
+;;la portante è sempre la N1esima armonica
+;;se N2=1, lo spettro contiene tutte le armoniche e la fondamentale è della frequenza di iC
+;;se N2 è pari, lo spettro contiene solo le armoniche dispari
+;;se N2=3, ogni terza armonica non sarà presente nello spettro
+;;--------
+;;lo spettro inarmonico si ottiene dal rapporto di numeri irrazionali
+;;;
+		opcode	FMsimple, a,iiiiiii
+;iC=[freq port],iM=[freq mod],iI(1-2)=[ind di modul 1 e 2], iFN(amp-mod)=[tabella dell' amp e mod] 
+itime,iC,iM,iI1,iI2,iFNmod,iFNamp xin
+iPeakdeviation=iI1*iM
+iPeakdeviation2=(iI2-iI1)*iM
+kAMPLITUDE Tabella itime,iFNamp
+kIMOD Tabella itime,iFNmod
+kIMOD=(kIMOD*iPeakdeviation2)+iPeakdeviation
+aM		oscil	kIMOD,iM
+aout	oscil	kAMPLITUDE,iC+aM
+	xout	aout
+		endop
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;SINTH CHE REAGISCE ALLA DINAMICA
+;;---iC:iM=N1:N2---
+;;la portante è sempre la N1esima armonica
+;;se N2=1, lo spettro contiene tutte le armoniche e la fondamentale è della frequenza di iC
+;;se N2 è pari, lo spettro contiene solo le armoniche dispari
+;;se N2=3, ogni terza armonica non sarà presente nello spettro
+;;--------
+;;lo spettro inarmonico si ottiene dal rapporto di numeri irrazionali
+;;;
+		opcode	FMpppsfz, a,iiiiii
+;iamp(i-f)=[start e end ampiezza della port],iC=[freq port],iM=[freq mod],iFN=[tabella]
+;decido il range d'ampiezza in modo da definire il range dinamico dello strumento, da cui deriva anche quello spettrale. 
+itime,iAmin,iAmax,iC,iM,iFN xin
+iI1=iAmin*10
+iI2=iAmax*10
+iPeakdeviation=iI2*iM
+
+kAMPLITUDE Tabella itime,iFN
+kIMOD Tabella itime,iFN
+
+kIMOD=kIMOD*iPeakdeviation
+kAMPLITUDE=kAMPLITUDE*iAmax
+aM		oscil	kIMOD,iM
+aout	oscil	kAMPLITUDE,iC+aM
+	xout	aout
+		endop
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
